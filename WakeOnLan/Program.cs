@@ -1,4 +1,9 @@
-﻿namespace WakeOnLan
+﻿//-----------------------------------------------------------------------
+// <copyright file="Program.cs" company="Andrew Beaton">
+//     Copyright (c) Andrew Beaton. All rights reserved. 
+// </copyright>
+//-----------------------------------------------------------------------
+namespace WakeOnLan
 {
     using System;
     using System.Globalization;
@@ -7,12 +12,16 @@
     using System.Runtime.InteropServices;
     using CommandLine;
 
-    class Program
+    /// <summary>
+    /// The main program.
+    /// </summary>
+    public class Program
     {
-        [DllImport("iphlpapi.dll", ExactSpelling = true)]
-        private static extern int SendARP(int DestIP, int SrcIP, byte[] pMacAddr, ref uint PhyAddrLen);
-
-        static void Main(string[] args)
+        /// <summary>
+        /// The main method.
+        /// </summary>
+        /// <param name="args">The main method arguments.</param>
+        public static void Main(string[] args)
         {
             string ipAddress = null;
             string macAddress = null;
@@ -83,7 +92,7 @@
 
                 SendWakeOnLanPacket(macAddress, port);
 
-                Console.WriteLine(String.Format("Sent Wake on Lan packet to {0} on UDP port {1}", macAddress, port));
+                Console.WriteLine(string.Format("Sent Wake on Lan packet to {0} on UDP port {1}", macAddress, port));
             }
             catch (Exception ex)
             {
@@ -127,7 +136,7 @@
         }
 
         /// <summary>
-        /// Sends a Wake-On-Lan packet to the specified MAC address and port.
+        /// Sends a Wake On LAN packet to the specified MAC address and port.
         /// </summary>
         /// <param name="macAddress">Physical MAC address to receive the WOL packet.</param>
         /// <param name="port">The UDP port to receive the WOL packet.</param>
@@ -139,9 +148,9 @@
         }
 
         /// <summary>
-        /// Sends a Wake-On-Lan packet to the specified MAC address and port.
+        /// Sends a Wake On LAN packet to the specified MAC address and port.
         /// </summary>
-        /// <param name="macAddress">Physical MAC address to recieve the WOL packet.</param>
+        /// <param name="macAddress">Physical MAC address to receive the WOL packet.</param>
         /// <param name="port">The UDP port to receive the WOL packet.</param>
         private static void SendWakeOnLanPacket(byte[] macAddress, int port)
         {
@@ -156,7 +165,7 @@
         }
 
         /// <summary>
-        /// Creates the magic packet required for Wake on Lan requests.
+        /// Creates the magic packet required for Wake on LAN requests.
         /// </summary>
         /// <param name="macAddress">The mac address to send to.</param>
         /// <returns>The magic packet.</returns>
@@ -188,7 +197,7 @@
         /// Gets a MAC address from an IP address on the local network 
         /// by parsing the ARP table.
         /// </summary>
-        /// <param name="ipAddress">The IP address to obtain the MAC addressfor</param>
+        /// <param name="ipAddress">The IP address to obtain the MAC address for.</param>
         /// <returns>The MAC address.</returns>
         private static string GetMacAddressFromARPTable(string ipAddress)
         {
@@ -199,15 +208,15 @@
 
             string macAddress = string.Empty;
 
-            System.Diagnostics.Process pProcess = new System.Diagnostics.Process();
-            pProcess.StartInfo.FileName = "arp";
-            pProcess.StartInfo.Arguments = "-a " + ipAddress;
-            pProcess.StartInfo.UseShellExecute = false;
-            pProcess.StartInfo.RedirectStandardOutput = true;
-            pProcess.StartInfo.CreateNoWindow = true;
-            pProcess.Start();
+            System.Diagnostics.Process process = new System.Diagnostics.Process();
+            process.StartInfo.FileName = "arp";
+            process.StartInfo.Arguments = "-a " + ipAddress;
+            process.StartInfo.UseShellExecute = false;
+            process.StartInfo.RedirectStandardOutput = true;
+            process.StartInfo.CreateNoWindow = true;
+            process.Start();
 
-            string strOutput = pProcess.StandardOutput.ReadToEnd();
+            string strOutput = process.StandardOutput.ReadToEnd();
             string[] substrings = strOutput.Split('-');
 
             if (substrings.Length < 8)
@@ -225,10 +234,10 @@
 
         /// <summary>
         /// Gets a MAC address from an IP address on the local network
-        /// by using the Microsoft IP Helper API (iphlpapi.dll)
-        /// https://msdn.microsoft.com/en-us/library/windows/desktop/aa366073%28v=vs.85%29.aspx
+        /// by using the Microsoft IP Helper API (iphlpapi.dll).
+        /// https://msdn.microsoft.com/en-us/library/windows/desktop/aa366073%28v=vs.85%29.aspx.
         /// </summary>
-        /// <param name="ipAddress">The IP address to obtain the MAC addressfor</param>
+        /// <param name="ipAddress">The IP address to obtain the MAC address for.</param>
         /// <returns>The MAC address.</returns>
         private static string GetMacAddressFromIPHelperAPI(string ipAddress)
         {
@@ -242,7 +251,7 @@
 
             var ip = System.BitConverter.ToInt32(IPAddress.Parse(ipAddress).GetAddressBytes(), 0);
 
-            if (SendARP(ip, 0, parts, ref macAddressLength) != 0)
+            if (NativeMethods.SendARP(ip, 0, parts, ref macAddressLength) != 0)
             {
                 throw new Exception("No ARP entries found.");
             }
