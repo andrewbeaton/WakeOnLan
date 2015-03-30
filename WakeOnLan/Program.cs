@@ -7,13 +7,13 @@
     using System.Runtime.InteropServices;
     using CommandLine;
 
-	class Program
-	{ 
+    class Program
+    {
         [DllImport("iphlpapi.dll", ExactSpelling = true)]
         private static extern int SendARP(int DestIP, int SrcIP, byte[] pMacAddr, ref uint PhyAddrLen);
-         
-		static void Main(string[] args)
-		{
+
+        static void Main(string[] args)
+        {
             string ipAddress = null;
             string macAddress = null;
             int port = 9;
@@ -40,7 +40,7 @@
             }
 
             if (ipAddress == null && macAddress == null)
-            { 
+            {
                 Console.WriteLine(options.GetUsage());
                 return;
             }
@@ -72,8 +72,8 @@
                 {
                     Console.WriteLine("MAC address determined to be {0}", macAddress);
                 }
-            } 
-           
+            }
+
             try
             {
                 if (options.Verbose)
@@ -89,8 +89,8 @@
             {
                 Console.WriteLine("Error sending Wake on Lan packet: {0}", ex.Message);
                 return;
-            } 
-		}
+            }
+        }
 
         /// <summary>
         /// Gets the mac address of a machine based on IP address.
@@ -132,28 +132,28 @@
         /// <param name="macAddress">Physical MAC address to receive the WOL packet.</param>
         /// <param name="port">The UDP port to receive the WOL packet.</param>
         private static void SendWakeOnLanPacket(string macAddress, int port)
-        { 
-            var macAddressByteArray = ConvertMacAddressStringToByteArray(macAddress); 
+        {
+            var macAddressByteArray = ConvertMacAddressStringToByteArray(macAddress);
 
             SendWakeOnLanPacket(macAddressByteArray, port);
-        } 
+        }
 
-		/// <summary>
-		/// Sends a Wake-On-Lan packet to the specified MAC address and port.
-		/// </summary>
-		/// <param name="macAddress">Physical MAC address to recieve the WOL packet.</param>
+        /// <summary>
+        /// Sends a Wake-On-Lan packet to the specified MAC address and port.
+        /// </summary>
+        /// <param name="macAddress">Physical MAC address to recieve the WOL packet.</param>
         /// <param name="port">The UDP port to receive the WOL packet.</param>
-		private static void SendWakeOnLanPacket(byte[] macAddress, int port)
-		{
-			// WOL packet is sent over UDP 255.255.255.0:{port}.
-			UdpClient client = new UdpClient();
-			client.Connect(IPAddress.Broadcast, port);
+        private static void SendWakeOnLanPacket(byte[] macAddress, int port)
+        {
+            // WOL packet is sent over UDP 255.255.255.0:{port}.
+            UdpClient client = new UdpClient();
+            client.Connect(IPAddress.Broadcast, port);
 
             byte[] packet = CreateWakOnLanPacket(macAddress);
 
-			// Send WOL packet.
-			client.Send(packet, packet.Length); 
-		} 
+            // Send WOL packet.
+            client.Send(packet, packet.Length);
+        }
 
         /// <summary>
         /// Creates the magic packet required for Wake on Lan requests.
@@ -184,12 +184,12 @@
             return packet;
         }
 
-		/// <summary>
-		/// Gets a MAC address from an IP address on the local network 
-		/// by parsing the ARP table.
+        /// <summary>
+        /// Gets a MAC address from an IP address on the local network 
+        /// by parsing the ARP table.
         /// </summary>
-		/// <param name="ipAddress">The IP address to obtain the MAC addressfor</param>
-		/// <returns>The MAC address.</returns>
+        /// <param name="ipAddress">The IP address to obtain the MAC addressfor</param>
+        /// <returns>The MAC address.</returns>
         private static string GetMacAddressFromARPTable(string ipAddress)
         {
             if (string.IsNullOrEmpty(ipAddress))
@@ -236,10 +236,10 @@
             {
                 throw new ArgumentNullException("No IP address provided.");
             }
-             
+
             byte[] parts = new byte[6];
-            uint macAddressLength = (uint)parts.Length; 
-             
+            uint macAddressLength = (uint)parts.Length;
+
             var ip = System.BitConverter.ToInt32(IPAddress.Parse(ipAddress).GetAddressBytes(), 0);
 
             if (SendARP(ip, 0, parts, ref macAddressLength) != 0)
